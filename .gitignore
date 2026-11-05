@@ -4,3 +4,8 @@ __pycache__/
 .venv/
 venv/
 .DS_Store
+
+# data sintetis hanya untuk uji alur, jangan ikut ter-commit
+data/_sintetis_jangan_dilaporkan.csv
+.idea/
+.vscode/

@@ -38,7 +38,8 @@ class Detector:
     def __init__(self):
         model = TreeModel.load(cfg.MODEL_PATH) if os.path.exists(cfg.MODEL_PATH) else None
         self.method = "tree" if model else "threshold"
-        print(f"[DETECTOR] Metode benturan: {'Decision Tree (' + cfg.MODEL_PATH + ')' if model else 'threshold (model.json tidak ditemukan)'}")
+        self.model_meta = model.meta if model else None
+        print(f"[DETECTOR] Metode klasifikasi: {'Decision Tree (' + cfg.MODEL_PATH + ')' if model else 'threshold (' + cfg.MODEL_PATH + ' tidak ditemukan)'}")
         self.judge = PacketJudge(cfg.Thresholds.from_env(), model)
         self.latest = {}    # device_id -> telemetry terakhir (sudah dinormalisasi)
         self.peak_max = {}  # device_id -> impact tertinggi sejak RESET
@@ -117,6 +118,8 @@ class Detector:
             "edge1": {"impact_peak_g": e1.get("impact_peak_g"), "lux_avg": e1.get("lux_avg")},
             "edge2": {"impact_peak_g": e2.get("impact_peak_g")},
             "padding_reduction_pct": reduction,
+            "model": ({"n_samples": self.model_meta.get("n_samples"), "test_accuracy": self.model_meta.get("test_accuracy")}
+                      if self.model_meta else None),
             "thresholds": {"benturan_g": self.judge.th.benturan_g, "rusak_g": self.judge.th.rusak_g},
             "decided_at_ms": int(time.time() * 1000),
         }
